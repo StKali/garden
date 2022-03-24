@@ -18,3 +18,16 @@ cobra-cli init -a "<st·kali clarkmonkey@163.com>" -l MIT --viper
 cobra-cli add config -a "<st·kali clarkmonkey@163.com>" -l MIT
 cobra-cli add server -a "<st·kali clarkmonkey@163.com>" -l MIT
 ```
+
+## migrate
+import golang migration
+
+[golang/migrate](https://github.com/golang-migrate/migrate)
+
+download: https://github.com/golang-migrate/migrate/releases
+
+
+```shell
+migrate create -ext sql -dir db/migrations -seq desc_table
+```
+

@@ -1,2 +1,4 @@
 log_file: ""
 log_level: info
+driver_name: postgres
+driver_source_name: postgresql://root:password@localhost:5432/garden?sslmode=disable
