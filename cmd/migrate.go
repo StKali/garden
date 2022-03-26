@@ -41,8 +41,8 @@ var migrateCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		m, err := migrate.New(
-			"file://db/migration",
-			setting.DriverSourceName,
+			setting.MigrateionDirectory,
+			setting.DatabaseDriverString,
 		)
 		util.CheckError("failed to connect database", err)
 		err = m.Steps(step)

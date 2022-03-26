@@ -4,7 +4,8 @@ type Setting struct {
 	LogFile string  `mapstructure:"log_file"`
 	LogLevel string `mapstructure:"log_level"`
 	DriverName string `mapstructure:"driver_name"`
-	DriverSourceName string `mapstructure:"driver_source_name"`
+	DatabaseDriverString string `mapstructure:"database_driver_string"`
+	MigrateionDirectory string `mapstructure:"migration_directory"`
 }
 
 var defaultSetting Setting
