@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	letterBytes   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	letterIdxBits = 6                    // 6 bits to represent a letter index
 	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
 	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
@@ -15,7 +15,7 @@ const (
 var src = rand.NewSource(time.Now().UnixNano())
 
 func RandString(n int) string {
-	
+
 	b := make([]byte, n)
 	for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
 		if remain == 0 {
@@ -32,10 +32,15 @@ func RandString(n int) string {
 }
 
 func RandInternalString(min, max int) string {
-	n := min + rand.Intn(max-min)
+	var n int
+	if max < min {
+		n = min - max
+	} else {
+		n = max - min
+	}
+	n = min + rand.Intn(n)
 	return RandString(n)
 }
-
 
 var emailSuffixs = []string{
 	"@google.com",
@@ -45,8 +50,7 @@ var emailSuffixs = []string{
 	"@outlook.com",
 }
 
-
 func RandEmail() string {
 	prefix := RandInternalString(1, 32)
-	return prefix + emailSuffixs[len(prefix) % len(emailSuffixs)]
+	return prefix + emailSuffixs[len(prefix)%len(emailSuffixs)]
 }
