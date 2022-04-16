@@ -43,13 +43,16 @@ var configCmd = &cobra.Command{
 	},
 }
 
-
 func CreateConfigFile(config string) error {
-	
+
 	viper.SetConfigType(CONFIG_TYPE)
 	viper.SetDefault("log_file", "")
 	viper.SetDefault("log_level", "info")
-	
+	viper.SetDefault("driver_name", "postgres")
+	viper.SetDefault("database_driver_string", "postgresql://root:password@localhost:5432/garden?sslmode=disable")
+	viper.SetDefault("migration_directory", "file://db/migration")
+	viper.SetDefault("gin_server_address", "0.0.0.0:8000")
+
 	return viper.WriteConfigAs(config)
 }
 

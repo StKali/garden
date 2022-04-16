@@ -99,6 +99,11 @@ func (s *Server) Login(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, errResponse(errors.New("username or password error")))
 		return
 	}
+	// create token
+	token, err := s.maker.CreateToken(req.Username, time.Second*60*60*24*7)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(errors.New("failed to create user token")))
+	}
 
 	res := &LoginResponse{
 		User: UserResponse{
@@ -108,6 +113,7 @@ func (s *Server) Login(ctx *gin.Context) {
 			PasswordChangedAt: user.PasswordChangedAt,
 			CreatedAt:         user.CreatedAt,
 		},
+		AccessToken: token,
 	}
 	ctx.JSON(http.StatusOK, res)
 }

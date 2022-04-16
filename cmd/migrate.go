@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 package cmd
+
 import (
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
@@ -41,7 +42,7 @@ var migrateCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		m, err := migrate.New(
-			setting.MigrateionDirectory,
+			setting.MigrationDirectory,
 			setting.DatabaseDriverString,
 		)
 		util.CheckError("failed to connect database", err)

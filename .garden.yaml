@@ -1,5 +1,6 @@
+database_driver_string: postgresql://root:password@localhost:5432/garden?sslmode=disable
+driver_name: postgres
+gin_server_address: 0.0.0.0:8000
 log_file: ""
 log_level: info
-driver_name: postgres
-database_driver_string: postgresql://root:password@localhost:5432/garden?sslmode=disable
 migration_directory: file://db/migration

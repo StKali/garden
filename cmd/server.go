@@ -22,20 +22,69 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-
+	"context"
+	"database/sql"
 	"github.com/spf13/cobra"
+	"github.com/stkali/garden/api"
+	db "github.com/stkali/garden/db/sqlc"
+	"github.com/stkali/garden/token"
+	"github.com/stkali/garden/util"
+	"github.com/stkali/log"
+	"os"
+	"os/signal"
 )
 
 // serverCmd represents the server command
 var serverCmd = &cobra.Command{
 	Use:   "server",
-	Short: "A brief description of your command",
+	Short: "Start garden server",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("server called")
+		// create database connect
+		conn, err := sql.Open(setting.DriverName, setting.DatabaseDriverString)
+		log.Infof("database driver: %s, source name: %s", setting.DriverName, setting.DatabaseDriverString)
+		util.CheckError("cannot open database", err)
+
+		// create store
+		store := db.NewStore(conn)
+		log.Infof("successfully created store instance.")
+
+		// create token maker
+		maker, err := token.NewJWTMaker(token.GenerateSymmetricKey())
+		util.CheckError("failed to create jwt maker", err)
+		log.Info("successfully created jwt token")
+
+		// launcher func of gin server
+		ginServer := func(address string) {
+			server := api.NewServer(store, maker)
+			server.Start(address)
+		}
+
+		ctx, cancel := signal.NotifyContext(context.Background(), os.Kill, os.Interrupt)
+		ActiveServer("gin-http", setting.GinServerAddress, ginServer, cancel)
+		<-ctx.Done()
+		log.Infof("garden stop!")
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(serverCmd)
+}
+
+type LaunchType func(address string)
+
+func ActiveServer(name string, address string, f LaunchType, cancel context.CancelFunc) {
+	go func() {
+		defer func() {
+			exc := recover()
+			if exc == nil {
+				log.Infof("%s server has stopped", name)
+				cancel()
+			} else {
+				log.Errorf("%s server stop, err: %+s", name, exc)
+			}
+			cancel()
+		}()
+		f(address)
+	}()
+	log.Infof("successfully active %s server on: %s", name, address)
 }
