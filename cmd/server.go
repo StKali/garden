@@ -49,9 +49,9 @@ var serverCmd = &cobra.Command{
 		log.Infof("successfully created store instance.")
 
 		// create token maker
-		maker, err := token.NewJWTMaker(token.GenerateSymmetricKey())
-		util.CheckError("failed to create jwt maker", err)
-		log.Info("successfully created jwt token")
+		maker, err := token.NewMaker(token.GenerateSymmetricKey(), setting.TokenType)
+		util.CheckError("failed to create token maker", err)
+		log.Infof("successfully created %s token token", setting.TokenType)
 
 		// launcher func of gin server
 		ginServer := func(address string) {

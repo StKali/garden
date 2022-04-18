@@ -4,3 +4,4 @@ gin_server_address: 0.0.0.0:8000
 log_file: ""
 log_level: info
 migration_directory: file://db/migration
+token_type: paseto

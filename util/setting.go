@@ -7,6 +7,7 @@ type Setting struct {
 	DatabaseDriverString string `mapstructure:"database_driver_string"`
 	MigrationDirectory   string `mapstructure:"migration_directory"`
 	GinServerAddress     string `mapstructure:"gin_server_address"`
+	TokenType            string `mapstructure:"token_type"`
 }
 
 var defaultSetting Setting

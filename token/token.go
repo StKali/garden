@@ -50,3 +50,14 @@ func (p *Payload) Valid() error {
 func GenerateSymmetricKey() string {
 	return util.RandString(chacha20poly1305.KeySize)
 }
+
+func NewMaker(key, _type string) (Maker, error) {
+	factory := NewPasetoMaker
+	switch _type {
+	case "paseto":
+		factory = NewPasetoMaker
+	case "jwt":
+		factory = NewJWTMaker
+	}
+	return factory(key)
+}
