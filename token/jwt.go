@@ -10,21 +10,24 @@ type JWTMaker struct {
 	secretKey string
 }
 
+// NewJWTMaker create a JWT token maker follow the Maker interface
 func NewJWTMaker(secretKey string) (Maker, error) {
 	return &JWTMaker{secretKey: secretKey}, nil
 }
 
-func (j *JWTMaker) CreateToken(username string, duration time.Duration) (string, error) {
+// CreateToken returns token, paylaod if creates token that specified username and duration success else error
+func (j *JWTMaker) CreateToken(username string, duration time.Duration) (string, *Payload, error) {
 	//TODO implement me
 	payload, err := NewPayload(username, duration)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
-
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
-	return jwtToken.SignedString([]byte(j.secretKey))
+	token, err := jwtToken.SignedString([]byte(j.secretKey))
+	return token, payload, err
 }
 
+// VerifyToken return the payload if the token is valid passed else error 
 func (j *JWTMaker) VerifyToken(token string) (*Payload, error) {
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)

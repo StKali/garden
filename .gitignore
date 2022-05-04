@@ -1,6 +1,9 @@
 # jetbrains files
 .idea
 
+#vscode files
+.vscode
+
 # build temporary files
 temporary
 

@@ -4,4 +4,6 @@ gin_server_address: 0.0.0.0:8000
 log_file: ""
 log_level: info
 migration_directory: file://db/migration
+refresh_token_duration: 336h0m0s
+token_duration: 24h0m0s
 token_type: paseto

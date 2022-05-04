@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -53,7 +54,8 @@ func CreateConfigFile(config string) error {
 	viper.SetDefault("migration_directory", "file://db/migration")
 	viper.SetDefault("gin_server_address", "0.0.0.0:8000")
 	viper.SetDefault("token_type", "paseto")
-
+	viper.SetDefault("token_duration", time.Hour * 24)
+	viper.SetDefault("refresh_token_duration", time.Hour * 24 * 14)
 	return viper.WriteConfigAs(config)
 }
 

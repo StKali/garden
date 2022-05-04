@@ -2,12 +2,14 @@ package api
 
 import (
 	"context"
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/stkali/errors"
 	db "github.com/stkali/garden/db/sqlc"
 	"github.com/stkali/garden/util"
-	"net/http"
-	"time"
 )
 
 type CreateUserRequest struct {
@@ -74,8 +76,12 @@ type UserResponse struct {
 }
 
 type LoginResponse struct {
-	User        UserResponse
-	AccessToken string
+	SessionID   uuid.UUID            `json:"session_id"`
+	User        UserResponse      `json:"user"`
+	AccessToken string            `json:"access_token"`
+	RefreshToken string           `json:"refresh_token"`
+	AccessExpireAt time.Time  `json:"access_expire_at"`
+	RefreshExpireAt time.Time `json:"refresh_expire_at"`
 }
 
 // Login handle view
@@ -89,22 +95,44 @@ func (s *Server) Login(ctx *gin.Context) {
 		return
 	}
 	// ensure has registered
-	user, err := s.store.GetUser(context.Background(), req.Username)
+	user, err := s.store.GetUser(ctx, req.Username)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, errResponse(err))
 		return
 	}
 	// verify password
 	if err = util.VerifyPassword(req.Password, user.HashedPassword); err != nil {
-		ctx.JSON(http.StatusUnauthorized, errResponse(errors.New("username or password error")))
+		ctx.JSON(http.StatusUnauthorized, errResponse(errors.New("username or password error, err: %s", err)))
 		return
 	}
-	// create token
-	token, err := s.maker.CreateToken(req.Username, time.Second*60*60*24*7)
+	// create access token
+	token, payload, err := s.maker.CreateToken(req.Username, setting.TokenDuration)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errResponse(errors.New("failed to create user token")))
+		ctx.JSON(http.StatusInternalServerError, errResponse(errors.New("failed to create user token, err: %s", err)))
 	}
 
+	// create refresh token
+	refreshToken, refreshPayload, err := s.maker.CreateToken(req.Username, setting.RefreshTokenDuration)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(errors.New("failed to create user refresh token, err: %s", err)))
+		return
+	}
+	// create session params to save session to database
+	createSessionParams := db.CreateSessionParams{
+		ID: refreshPayload.ID,
+		Username: refreshPayload.Username,
+		RefreshToken: refreshToken,
+		UserAgent: ctx.Request.UserAgent(),
+		ClientIp: ctx.ClientIP(),
+		ExpiresAt: refreshPayload.ExpiredAt,
+	}
+	// save user ssession to database
+	session, err := s.store.CreateSession(ctx, createSessionParams)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errResponse(errors.New("failed to store session to db, err: %s", err)))
+		return
+	}
+	// make login success response
 	res := &LoginResponse{
 		User: UserResponse{
 			Username:          user.Username,
@@ -114,14 +142,12 @@ func (s *Server) Login(ctx *gin.Context) {
 			CreatedAt:         user.CreatedAt,
 		},
 		AccessToken: token,
+		AccessExpireAt: payload.ExpiredAt,
+		RefreshToken: refreshToken,
+		RefreshExpireAt: refreshPayload.ExpiredAt,
+		SessionID: session.ID,
 	}
 	ctx.JSON(http.StatusOK, res)
-}
-
-// Start http server on address
-func (s *Server) Start(address string) {
-	err := s.engine.Run(address)
-	util.CheckError("cannot start HTTP server, err:", err)
 }
 
 // errResponse wrap err to gin.H

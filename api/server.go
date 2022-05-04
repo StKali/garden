@@ -3,8 +3,12 @@ package api
 import (
 	db "github.com/stkali/garden/db/sqlc"
 	"github.com/stkali/garden/token"
+	"github.com/stkali/garden/util"
+	"github.com/gin-gonic/gin"
+	
 )
-import "github.com/gin-gonic/gin"
+
+var setting = util.GetSetting()
 
 type Server struct {
 	store  db.Querier
@@ -26,4 +30,10 @@ func NewServer(store db.Querier, maker token.Maker) *Server {
 func registerRouts(server *Server) {
 	server.engine.POST("/user", server.CreateUser)
 	server.engine.GET("/login", server.Login)
+}
+
+// Start http server on address
+func (s *Server) Start(address string) {
+	err := s.engine.Run(address)
+	util.CheckError("cannot start HTTP server, err:", err)
 }
