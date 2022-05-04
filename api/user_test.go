@@ -5,16 +5,18 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	_ "github.com/lib/pq"
-	db "github.com/stkali/garden/db/sqlc"
-	"github.com/stkali/garden/util"
-	"github.com/stretchr/testify/require"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
+
+	_ "github.com/lib/pq"
+	db "github.com/stkali/garden/db/sqlc"
+	"github.com/stkali/garden/token"
+	"github.com/stkali/garden/util"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -22,12 +24,18 @@ const (
 	DN  = "postgres"
 )
 
-var query db.Querier
+var (
+	query db.Querier
+	maker token.Maker
+)
 
 func TestMain(m *testing.M) {
 	conn, err := sql.Open(DN, DSN)
 	util.CheckError("failed to create db connect", err)
 	query = db.NewStore(conn)
+
+	maker, err = token.NewMaker(token.GenerateSymmetricKey(), "poseto")
+	util.CheckError("failed to create token maker", err)
 	os.Exit(m.Run())
 }
 
@@ -55,7 +63,7 @@ func matchUser(t *testing.T, actUser *UserResponse, wantUser *db.User) {
 func TestCreateUser(t *testing.T) {
 	password := util.RandString(8)
 	user := generateRandUser(t, password)
-	server := NewServer(query)
+	server := NewServer(query, maker)
 	cases := []struct {
 		Name  string
 		Body  CreateUserRequest
@@ -193,7 +201,7 @@ func TestLogin(t *testing.T) {
 			require.NoError(t, err)
 			request := httptest.NewRequest(http.MethodGet, "/login", bytes.NewReader(data))
 			recorder := httptest.NewRecorder()
-			server := NewServer(query)
+			server := NewServer(query, maker)
 			server.engine.ServeHTTP(recorder, request)
 			c.Check(t, recorder)
 		})
