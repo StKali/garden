@@ -2,9 +2,10 @@ package util
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/stkali/errors"
 	"golang.org/x/crypto/bcrypt"
-	"os"
 )
 
 const START_FAILED = 1

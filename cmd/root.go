@@ -34,17 +34,18 @@ import (
 
 const (
 	PROGRAM_NAME = "garden"
-	CONFIG_TYPE = "yaml"
-	CONFIG_NAME = ".garden"
-	VERSION = "0.1.0"	
+	CONFIG_TYPE  = "yaml"
+	CONFIG_NAME  = ".garden"
+	VERSION      = "0.1.0"
 )
+
 var cfgFile string
 var setting = util.GetSetting()
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   PROGRAM_NAME,
-	Short: "go language backend playground",
+	Use:     PROGRAM_NAME,
+	Short:   "go language backend playground",
 	Version: VERSION,
 	// disable default command eg: completion
 	CompletionOptions: cobra.CompletionOptions{
@@ -62,7 +63,9 @@ func Execute() {
 }
 
 func init() {
-	if len(os.Args) > 1 && os.Args[1] == "config"{ return }
+	if len(os.Args) > 1 && os.Args[1] == "config" {
+		return
+	}
 	cobra.OnInitialize(initConfig, initLogger)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.garden.yaml)")
 }
@@ -95,7 +98,7 @@ func initConfig() {
 	viper.Unmarshal(setting)
 }
 
-func initLogger(){
+func initLogger() {
 	log.SetLevel(setting.LogLevel)
 	var (
 		logger io.Writer

@@ -2,8 +2,9 @@ package token
 
 import (
 	"errors"
-	"github.com/dgrijalva/jwt-go"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 type JWTMaker struct {
@@ -27,7 +28,7 @@ func (j *JWTMaker) CreateToken(username string, duration time.Duration) (string,
 	return token, payload, err
 }
 
-// VerifyToken return the payload if the token is valid passed else error 
+// VerifyToken return the payload if the token is valid passed else error
 func (j *JWTMaker) VerifyToken(token string) (*Payload, error) {
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)

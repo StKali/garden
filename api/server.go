@@ -30,6 +30,8 @@ func NewServer(store db.Querier, maker token.Maker) *Server {
 func registerRouts(server *Server) {
 	server.engine.POST("/user", server.CreateUser)
 	server.engine.GET("/login", server.Login)
+	server.engine.GET("/home", authMiddleware(server.maker), server.Home)
+	server.engine.GET("", server.Home)
 }
 
 // Start http server on address

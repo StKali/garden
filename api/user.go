@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stkali/errors"
 	db "github.com/stkali/garden/db/sqlc"
+	"github.com/stkali/garden/token"
 	"github.com/stkali/garden/util"
 )
 
@@ -148,6 +150,18 @@ func (s *Server) Login(ctx *gin.Context) {
 		SessionID: session.ID,
 	}
 	ctx.JSON(http.StatusOK, res)
+}
+
+
+// Home view
+func (s *Server) Home(ctx *gin.Context) {
+
+	payload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	ctx.JSON(http.StatusOK, gin.H{
+		"info": fmt.Sprintf("welcome to %s home", payload.Username),
+		"username": payload.Username,
+		"expire at": payload.ExpiredAt,
+	})
 }
 
 // errResponse wrap err to gin.H

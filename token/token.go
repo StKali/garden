@@ -2,10 +2,12 @@ package token
 
 import (
 	"errors"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/stkali/garden/util"
+	"github.com/stkali/log"
 	"golang.org/x/crypto/chacha20poly1305"
-	"time"
 )
 
 var (
@@ -41,6 +43,7 @@ func NewPayload(username string, duration time.Duration) (*Payload, error) {
 }
 
 func (p *Payload) Valid() error {
+	log.Infof("expire at: %s", p.ExpiredAt)
 	if time.Now().After(p.ExpiredAt) {
 		return ExpiredToken
 	}

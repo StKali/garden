@@ -24,14 +24,15 @@ package cmd
 import (
 	"context"
 	"database/sql"
+	"os"
+	"os/signal"
+
 	"github.com/spf13/cobra"
 	"github.com/stkali/garden/api"
 	db "github.com/stkali/garden/db/sqlc"
 	"github.com/stkali/garden/token"
 	"github.com/stkali/garden/util"
 	"github.com/stkali/log"
-	"os"
-	"os/signal"
 )
 
 // serverCmd represents the server command
@@ -49,7 +50,9 @@ var serverCmd = &cobra.Command{
 		log.Infof("successfully created store instance.")
 
 		// create token maker
-		maker, err := token.NewMaker(token.GenerateSymmetricKey(), setting.TokenType)
+		secretKey := token.GenerateSymmetricKey()
+		log.Infof("set secret key: %s", secretKey)
+		maker, err := token.NewMaker(secretKey, setting.TokenType)
 		util.CheckError("failed to create token maker", err)
 		log.Infof("successfully created %s token token", setting.TokenType)
 
