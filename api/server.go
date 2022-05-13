@@ -1,11 +1,10 @@
 package api
 
 import (
+	"github.com/gin-gonic/gin"
 	db "github.com/stkali/garden/db/sqlc"
 	"github.com/stkali/garden/token"
 	"github.com/stkali/garden/util"
-	"github.com/gin-gonic/gin"
-	
 )
 
 var setting = util.GetSetting()
@@ -30,7 +29,7 @@ func NewServer(store db.Querier, maker token.Maker) *Server {
 func registerRouts(server *Server) {
 	server.engine.POST("/user", server.CreateUser)
 	server.engine.GET("/login", server.Login)
-	server.engine.GET("/home", authMiddleware(server.maker), server.Home)
+	server.engine.GET("/home", authMiddleware(server.maker, server.store), server.Home)
 	server.engine.GET("", server.Home)
 }
 

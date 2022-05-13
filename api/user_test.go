@@ -53,7 +53,7 @@ func generateRandUser(t *testing.T, password string) *db.User {
 	}
 }
 
-func matchUser(t *testing.T, actUser *UserResponse, wantUser *db.User) {
+func matchUser(t *testing.T, actUser *UserInfo, wantUser *db.User) {
 	require.Equal(t, actUser.Username, wantUser.Username)
 	require.Equal(t, actUser.FullName, wantUser.FullName)
 	require.Equal(t, actUser.Email, wantUser.Email)
@@ -82,7 +82,7 @@ func TestCreateUser(t *testing.T) {
 				require.Equal(t, http.StatusOK, recorder.Code)
 				data, err := io.ReadAll(recorder.Body)
 				require.NoError(t, err)
-				res := new(UserResponse)
+				res := new(UserInfo)
 				err = json.Unmarshal(data, res)
 				require.NoError(t, err)
 
@@ -168,10 +168,10 @@ func TestLogin(t *testing.T) {
 				require.Equal(t, http.StatusOK, recorder.Code)
 				data, err := io.ReadAll(recorder.Body)
 				require.NoError(t, err)
-				res := new(LoginResponse)
+				res := new(UserInfo)
 				err = json.Unmarshal(data, res)
 				require.NoError(t, err)
-				matchUser(t, &res.User, &user)
+				matchUser(t, res, &user)
 			},
 		},
 		{
