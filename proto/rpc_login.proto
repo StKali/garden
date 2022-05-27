@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/stkali/garden/pb";
+
+message LoginRequest {
+    string Username = 1;
+    string Password = 2;
+}
+

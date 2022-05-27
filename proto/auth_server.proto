@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package pb;
+
+import "rpc_create_user.proto";
+import "rpc_login.proto";
+import "auth.proto";
+
+option go_package = "github.com/stkali/garden/pb";
+
+
+service AuthService {
+    rpc CreateUser(CreateUserRequest) returns (UserInfo) {}
+    rpc Login(LoginRequest) returns (UserInfo){}
+}

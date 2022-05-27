@@ -24,3 +24,11 @@ test:
 	echo "start render coverage report to coverage.html"
 	go tool cover --html=cover.out -o coverage.html
 	echo "create coverage report at: coverage.html"
+
+proto:
+	rm -f pb/*.go
+	protoc --proto_path=proto --go_out=pb --go_opt=paths=source_relative \
+	--go-grpc_out=pb --go-grpc_opt=paths=source_relative \
+	proto/*.proto
+
+.PHONY: start_pg_server stop_pg_server create_migrate test proto

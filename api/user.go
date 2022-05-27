@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -34,22 +33,23 @@ func (s *Server) CreateUser(ctx *gin.Context) {
 		return
 	}
 	if req.Password != req.ConfirmPassword {
-		ctx.JSON(http.StatusBadRequest, errResponse("password != verify password"))
+		ctx.JSON(http.StatusBadRequest, errResponse("password != confirm password"))
 		return
 	}
 	passwordHash, err := util.HashPassword(req.Password)
 	if err != nil {
 		log.Errorf("failed to hash password, password: %s err: %s", req.Password, err)
-		ctx.JSON(http.StatusInternalServerError, errResponse(InternalError.Error()))
+		ctx.JSON(http.StatusInternalServerError, errResponse(InternalError))
 		return
 	}
+	// prepare save user to storage
 	arg := db.CreateUserParams{
 		Username:       req.Username,
 		HashedPassword: passwordHash,
 		FullName:       req.FullName,
 		Email:          req.Email,
 	}
-	user, err := s.store.CreateUser(context.Background(), arg)
+	user, err := s.store.CreateUser(ctx, arg)
 	if err != nil {
 		log.Errorf("failed to create user, err: %s", err)
 		ctx.JSON(http.StatusInternalServerError, errResponse(InternalError))

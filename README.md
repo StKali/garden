@@ -61,3 +61,23 @@ genreate go code from sql query
 ```shell
 sqlc generate
 ```
+
+## protoc & gRPC
+install proto buffer compiler
+
+[🏠 protocolbuffers/protobuf](https://github.com/protocolbuffers/protobuf)
+
+[👉 download list](https://github.com/protocolbuffers/protobuf/releases)
+
+install Golang plugins for the protocol compiler:
+```shell
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+```
+
+Update your PATH so that the protoc compiler can find the plugins:
+```shell
+export PATH="$PATH:$(go env GOPATH)/bin"
+# or write it to profile or zshrc file
+```
+

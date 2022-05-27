@@ -30,6 +30,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/stkali/garden/api"
 	db "github.com/stkali/garden/db/sqlc"
+	"github.com/stkali/garden/rpc"
 	"github.com/stkali/garden/token"
 	"github.com/stkali/garden/util"
 	"github.com/stkali/log"
@@ -61,9 +62,15 @@ var serverCmd = &cobra.Command{
 			server := api.NewServer(store, maker)
 			server.Start(address)
 		}
-
+		// launcher func of rpc server
+		rpcServer := func(address string) {
+			server, err := rpc.NewServer(store, maker)
+			util.CheckError("failed to create rpc server, err: %s", err)
+			server.Start(address)
+		}
 		ctx, cancel := signal.NotifyContext(context.Background(), os.Kill, os.Interrupt)
 		ActiveServer("gin-http", setting.GinServerAddress, ginServer, cancel)
+		ActiveServer("gRPC", setting.GRPCServerAddress, rpcServer, cancel)
 		<-ctx.Done()
 		log.Infof("garden stop!")
 	},
