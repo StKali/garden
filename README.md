@@ -81,3 +81,18 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 # or write it to profile or zshrc file
 ```
 
+## evans
+
+[🏠 ktr0731/evans](https://github.com/ktr0731/evans)
+
+[👉 download list](https://github.com/ktr0731/evans/releases)
+
+> evans is a gRPC client
+```
+# regsiter reflection
+reflection.Register(grpcServer)
+```
+connect rpc server
+```shell
+evans -r repl --host <server address> --port <server port>
+```
