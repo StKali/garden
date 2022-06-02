@@ -62,12 +62,14 @@ var serverCmd = &cobra.Command{
 			server := api.NewServer(store, maker)
 			server.Start(address)
 		}
+
 		// launcher func of rpc server
 		rpcServer := func(address string) {
 			server, err := rpc.NewServer(store, maker)
 			util.CheckError("failed to create rpc server, err: %s", err)
 			server.Start(address)
 		}
+
 		ctx, cancel := signal.NotifyContext(context.Background(), os.Kill, os.Interrupt)
 		ActiveServer("gin-http", setting.GinServerAddress, ginServer, cancel)
 		ActiveServer("gRPC", setting.GRPCServerAddress, rpcServer, cancel)

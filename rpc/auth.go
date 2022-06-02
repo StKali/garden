@@ -32,15 +32,18 @@ func makeSession(ctx context.Context, user *db.User, maker token.Maker, store db
 		log.Errorf("failed to create user refresh token, err: %s", err)
 		return nil, &Error{codes.Internal, InternalErrorString}
 	}
+	
 	// create session params to save session to database
+	meta := metaFromCtx(ctx)
 	createSessionParams := db.CreateSessionParams{
 		ID:           refreshPayload.ID,
 		Username:     refreshPayload.Username,
 		RefreshToken: refreshToken,
-		//UserAgent:    ctx.Request.UserAgent(),  todo
-		//ClientIp:     ctx.ClientIP(),
-		ExpiresAt: refreshPayload.ExpiredAt,
+		UserAgent:    meta.UserAgent,
+		ClientIp:     meta.ClientIP,
+		ExpiresAt:    refreshPayload.ExpiredAt,
 	}
+
 	// save user ssession to database
 	session, err := store.CreateSession(ctx, createSessionParams)
 	if err != nil {
@@ -96,7 +99,7 @@ func (s *Server) CreateUser(ctx context.Context, request *pb.CreateUserRequest) 
 func (s *Server) Login(ctx context.Context, request *pb.LoginRequest) (*pb.UserInfo, error) {
 
 	// ensure has registered
-	user, err := s.store.GetUser(context.Background(), request.Username)
+	user, err := s.store.GetUser(ctx, request.Username)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "not registered user: %s", request.Username)
 	}
