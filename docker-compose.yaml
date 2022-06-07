@@ -1,0 +1,28 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  garden:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000 # gin HTTP
+      - 8001:8001 # grpc
+    volumes:
+      - ./.garden.yaml:/workspace/.garden.yaml
+    environment:
+      - GIN_MODE=release
+      - DATABASE_DRIVER_STRING=postgresql://root:password@pgsql:5432/garden?sslmode=disable
+    depends_on:
+      - pgsql
+  pgsql:
+    image: postgres:12-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=garden
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./temporary/data/:/var/lib/postgresql/data/pgdata
+
