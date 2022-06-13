@@ -2,6 +2,5 @@
 
 set -e
 echo "exec database migration"
-/workspace/garden migrate -s 2
+/workspace/garden migrate
 exec "$@"
-

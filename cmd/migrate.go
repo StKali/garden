@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -47,14 +48,27 @@ var migrateCmd = &cobra.Command{
 			setting.DatabaseDriverString,
 		)
 		util.CheckError("failed to connect database", err)
-		err = m.Steps(step)
-		util.CheckError("failed to migrate database changed", err)
-		fmt.Println("successfully to migrate database")
+		// migrate all revision
+		if step == 0 {
+			err = m.Up()
+		// migrate specify revision (up or down)
+		} else {
+			err = m.Steps(step)
+		}
+		switch err {
+		case migrate.ErrNoChange:
+			fmt.Println("warning: migrate does nothing")
+		case os.ErrNotExist:
+			fmt.Printf("warning: specify step overflow: %d\n", step)
+		case nil:
+			fmt.Println("successfully to migrate database")
+		default:
+			util.CheckError("failed to migrate database changed", err)	
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(migrateCmd)
-	migrateCmd.Flags().IntVarP(&step, "step", "s", 1, "")
-	_ = migrateCmd.MarkFlagRequired("step")
+	migrateCmd.Flags().IntVarP(&step, "step", "s", 0, "")
 }
