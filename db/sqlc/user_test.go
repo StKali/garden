@@ -1,64 +1,79 @@
 package db
 
-
 import (
 	"context"
-	"database/sql"
+	"log"
+	"testing"
+	"time"
+
 	_ "github.com/lib/pq"
 	"github.com/stkali/garden/util"
 	"github.com/stretchr/testify/require"
-	"log"
-	"os"
-	"testing"
 )
-
-const (
-	DSN = "postgres://root:password@localhost:5432/garden?sslmode=disable"
-	DN  = "postgres"
-)
-
-var query Querier
-
-func TestMain(m *testing.M) {
-	conn, err := sql.Open(DN, DSN)
-	if err != nil {
-		log.Fatalf("failed to create db connect, err: %s", err)
-	}
-	query = NewStore(conn)
-	os.Exit(m.Run())
-}
 
 func TestNewStore(t *testing.T) {
 	require.NotNil(t, query)
 }
 
-func TestCreateUser(t *testing.T) {
-	params := CreateUserParams{
-		Username:       util.RandInternalString(0, 10),
-		HashedPassword: util.RandInternalString(0, 10),
-		FullName:       util.RandInternalString(0, 10),
-		Email:          util.RandEmail(),
+func RandUser() User {
+
+	password := util.RandInternalString(8, 36)
+	hashPassword, err := util.HashPassword(password)
+	if err != nil {
+		log.Fatal("failed to create rand user")
 	}
-	ctx := context.Background()
-	user, err := query.CreateUser(ctx, params)
-	require.NoError(t, err)
-	require.Equal(t, user.Email, params.Email)
+	return User{
+		Username:          util.RandInternalString(4, 16),
+		FullName:          util.RandInternalString(6, 18),
+		HashedPassword:    hashPassword,
+		Email:             util.RandEmail(),
+		CreatedAt:         time.Now(),
+		PasswordChangedAt: time.Now(),
+	}
 }
+
+func TestCreateUser(t *testing.T) {
+	ctx := context.Background()
+	_ = MakeAndSaveUser(ctx, t)
+}
+
+func CompareUser(expect, actual User) bool {
+	if expect.Username != actual.Username {
+		return false
+	}
+	if expect.FullName != actual.FullName {
+		return false
+	}
+	if expect.Email != actual.Email {
+		return false
+	}
+	if expect.HashedPassword != actual.HashedPassword {
+		return false
+	}
+	return true
+}
+
+func MakeAndSaveUser(ctx context.Context, t *testing.T) User {
+	user := RandUser()
+	params := CreateUserParams{
+		Username:       user.Username,
+		HashedPassword: user.HashedPassword,
+		FullName:       user.FullName,
+		Email:          user.Email,
+	}
+	createdUser, err := query.CreateUser(ctx, params)
+	require.NoError(t, err)
+	require.True(t, CompareUser(user, createdUser))
+	return user
+}
+
 
 func TestGetUser(t *testing.T) {
-	params := CreateUserParams{
-		Username:       util.RandInternalString(0, 10),
-		HashedPassword: util.RandInternalString(0, 10),
-		FullName:       util.RandInternalString(0, 10),
-		Email:          util.RandEmail(),
-	}
 	ctx := context.Background()
-	user, err := query.CreateUser(ctx, params)
+	user := MakeAndSaveUser(ctx, t)
+	getUser, err := query.GetUser(ctx, user.Username)
 	require.NoError(t, err)
-	require.Equal(t, user.Email, params.Email)
-
-	user2, err := query.GetUser(ctx, params.Username)
-	require.NoError(t, err)
-	require.Equal(t, user2, user)
+	user.CreatedAt = getUser.CreatedAt
+	user.PasswordChangedAt = getUser.PasswordChangedAt
+	require.True(t, CompareUser(user, getUser))
 }
-

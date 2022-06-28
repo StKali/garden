@@ -3,6 +3,7 @@ package util
 import (
 	"math/rand"
 	"time"
+	"fmt"
 )
 
 const (
@@ -53,4 +54,8 @@ var emailSuffixs = []string{
 func RandEmail() string {
 	prefix := RandInternalString(1, 32)
 	return prefix + emailSuffixs[len(prefix)%len(emailSuffixs)]
+}
+
+func RandIP() string {
+	return fmt.Sprintf("%d.%d.%d.%d", rand.Int31n(255),rand.Int31n(255),rand.Int31n(255),rand.Int31n(255))
 }

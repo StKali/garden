@@ -36,10 +36,11 @@ func TestMain(m *testing.M) {
 
 	maker, err = token.NewMaker(token.GenerateSymmetricKey(), "poseto")
 	util.CheckError("failed to create token maker", err)
+
 	os.Exit(m.Run())
 }
 
-func generateRandUser(t *testing.T, password string) *db.User {
+func RandUser(t *testing.T, password string) *db.User {
 	hashPassword, err := util.HashPassword(password)
 	require.NoError(t, err)
 	current := time.Now()
@@ -62,7 +63,7 @@ func matchUser(t *testing.T, actUser *UserInfo, wantUser *db.User) {
 
 func TestCreateUser(t *testing.T) {
 	password := util.RandString(8)
-	user := generateRandUser(t, password)
+	user := RandUser(t, password)
 	server := NewServer(query, maker)
 	cases := []struct {
 		Name  string
