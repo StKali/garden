@@ -1,9 +1,9 @@
 package util
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
-	"fmt"
 )
 
 const (
@@ -33,13 +33,10 @@ func RandString(n int) string {
 }
 
 func RandInternalString(min, max int) string {
-	var n int
-	if max < min {
-		n = min - max
-	} else {
-		n = max - min
+	if min > max {
+		max, min = min, max
 	}
-	n = min + rand.Intn(n)
+	n := min + rand.Intn(max - min)
 	return RandString(n)
 }
 
