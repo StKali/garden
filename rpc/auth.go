@@ -32,9 +32,9 @@ func makeSession(ctx context.Context, user *db.User, maker token.Maker, store db
 		log.Errorf("failed to create user refresh token, err: %s", err)
 		return nil, &Error{codes.Internal, InternalErrorString}
 	}
-	
-	// create session params to save session to database
 	meta := metaFromCtx(ctx)
+
+	// create session params to save session to database
 	createSessionParams := db.CreateSessionParams{
 		ID:           refreshPayload.ID,
 		Username:     refreshPayload.Username,

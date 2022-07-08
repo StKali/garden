@@ -6,7 +6,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetSetting(t *testing.T) {
+
+func TestGetSetting(t *testing.T){
 	s := GetSetting()
 	require.True(t, s == &defaultSetting)
 }

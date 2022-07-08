@@ -5,11 +5,22 @@ package pb;
 import "rpc_create_user.proto";
 import "rpc_login.proto";
 import "auth.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/stkali/garden/pb";
 
 
 service AuthService {
-    rpc CreateUser(CreateUserRequest) returns (UserInfo) {}
-    rpc Login(LoginRequest) returns (UserInfo){}
+    rpc CreateUser(CreateUserRequest) returns (UserInfo) {
+        option (google.api.http) = {
+            post: "/v1/user"
+            body: "*"
+        };
+    }
+    rpc Login(LoginRequest) returns (UserInfo){
+        option (google.api.http) = {
+            post: "/v1/login"
+            body: "*"
+        };
+    }
 }

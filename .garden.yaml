@@ -1,6 +1,7 @@
 database_driver_string: postgresql://root:password@localhost:5432/garden?sslmode=disable
 driver_name: postgres
 gin_server_address: 0.0.0.0:8000
+grpc_gateway_address: 0.0.0.0:8002
 grpc_server_address: 0.0.0.0:8001
 log_file: ""
 log_level: info

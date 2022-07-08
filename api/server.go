@@ -28,7 +28,7 @@ func NewServer(store db.Querier, maker token.Maker) *Server {
 // registerRouts register routs to gin engine
 func registerRouts(server *Server) {
 	server.engine.POST("/user", server.CreateUser)
-	server.engine.GET("/login", server.Login)
+	server.engine.POST("/login", server.Login)
 	server.engine.GET("/home", authMiddleware(server.maker, server.store), server.Home)
 	server.engine.GET("", authMiddleware(server.maker, server.store), server.Home)
 }
@@ -36,5 +36,5 @@ func registerRouts(server *Server) {
 // Start http server on address
 func (s *Server) Start(address string) {
 	err := s.engine.Run(address)
-	util.CheckError("cannot start HTTP server, err:", err)
+	util.CheckError("failed to start HTTP server", err)
 }

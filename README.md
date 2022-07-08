@@ -90,9 +90,53 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 > evans is a gRPC client
 ```
 # regsiter reflection
+
 reflection.Register(grpcServer)
 ```
 connect rpc server
 ```shell
 evans -r repl --host <server address> --port <server port>
 ```
+
+## grpc-gateway
+generate http server by protobuf and grpc
+[🏠 grpc-ecosystem/grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
+
+[👉 download list](https://github.com/grpc-ecosystem/grpc-gateway/releases)
+
+1 copy *.proto to project
+```go
+// +build tools
+
+package tools
+
+import (
+    _ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway"
+    _ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2"
+    _ "google.golang.org/grpc/cmd/protoc-gen-go-grpc"
+    _ "google.golang.org/protobuf/cmd/protoc-gen-go"
+)
+```
+
+```shell
+# pull dependencies
+go mod tidy
+
+# install binaries
+go install \
+    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway \
+    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2 \
+    google.golang.org/protobuf/cmd/protoc-gen-go \
+    google.golang.org/grpc/cmd/protoc-gen-go-grpc
+```
+add file to $PROJECT/proto/google/api/*.proto
+
+[🏠 googleapis/googleapis](https://github.com/googleapis/googleapis)
+```shell
+google/api/annotations.proto
+google/api/field_behavior.proto
+google/api/http.proto
+google/api/httpbody.proto
+```
+
+

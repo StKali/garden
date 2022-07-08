@@ -12,10 +12,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	db "github.com/stkali/garden/db/sqlc"
 	"github.com/stkali/garden/token"
 	"github.com/stkali/garden/util"
+	"github.com/stkali/log"
 	"github.com/stretchr/testify/require"
 )
 
@@ -30,6 +32,9 @@ var (
 )
 
 func TestMain(m *testing.M) {
+
+	log.SetLevel("Warning")
+	gin.SetMode("release")
 	conn, err := sql.Open(DN, DSN)
 	util.CheckError("failed to create db connect", err)
 	query = db.NewStore(conn)
@@ -141,19 +146,17 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-
-	password := util.RandInternalString(8, 32)
-	hashPassword, err := util.HashPassword(password)
-	require.NoError(t, err)
+	server := NewServer(query, maker)
 	// create a valid user
+	password := util.RandInternalString(8, 32)
+	randUser := RandUser(t, password)
 	user, err := query.CreateUser(context.Background(), db.CreateUserParams{
-		Username:       util.RandInternalString(8, 16),
-		HashedPassword: hashPassword,
-		FullName:       util.RandString(8),
-		Email:          util.RandEmail(),
+		Username:       randUser.Username,
+		HashedPassword: randUser.HashedPassword,
+		FullName:       randUser.FullName,
+		Email:          randUser.Email,
 	})
 	require.NoError(t, err)
-
 	cases := []struct {
 		Name  string
 		Body  LoginRequest
@@ -178,7 +181,7 @@ func TestLogin(t *testing.T) {
 		{
 			"NotRegistered",
 			LoginRequest{
-				Username: user.Username + "a",
+				Username: user.Username + "aws",
 				Password: password,
 			},
 			func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -198,11 +201,10 @@ func TestLogin(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.Name, func(t *testing.T) {
+			recorder := httptest.NewRecorder()
 			data, err := json.Marshal(c.Body)
 			require.NoError(t, err)
-			request := httptest.NewRequest(http.MethodGet, "/login", bytes.NewReader(data))
-			recorder := httptest.NewRecorder()
-			server := NewServer(query, maker)
+			request := httptest.NewRequest(http.MethodPost, "/login", bytes.NewReader(data))
 			server.engine.ServeHTTP(recorder, request)
 			c.Check(t, recorder)
 		})

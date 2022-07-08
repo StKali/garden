@@ -24,6 +24,7 @@ package cmd
 import (
 	"context"
 	"database/sql"
+	"github.com/stkali/garden/gateway"
 	"os"
 	"os/signal"
 
@@ -66,13 +67,21 @@ var serverCmd = &cobra.Command{
 		// launcher func of rpc server
 		rpcServer := func(address string) {
 			server, err := rpc.NewServer(store, maker)
-			util.CheckError("failed to create rpc server, err: %s", err)
+			util.CheckError("failed to create rpc server", err)
+			server.Start(address)
+		}
+
+		// launcher func of rpc-gateway server
+		gatewayServer := func(address string) {
+			server, err := gateway.NewServer(store, maker)
+			util.CheckError("failed to create rpc-gateway", err)
 			server.Start(address)
 		}
 
 		ctx, cancel := signal.NotifyContext(context.Background(), os.Kill, os.Interrupt)
 		ActiveServer("gin-http", setting.GinServerAddress, ginServer, cancel)
-		ActiveServer("gRPC", setting.GRPCServerAddress, rpcServer, cancel)
+		ActiveServer("grpc", setting.GRPCServerAddress, rpcServer, cancel)
+		ActiveServer("grpc-gateway", setting.GRPCGatewayAddress, gatewayServer, cancel)
 		<-ctx.Done()
 		log.Infof("garden stop!")
 	},

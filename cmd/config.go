@@ -54,6 +54,7 @@ func CreateConfigFile(config string) error {
 	viper.SetDefault("migration_directory", "file://db/migration")
 	viper.SetDefault("gin_server_address", "0.0.0.0:8000")
 	viper.SetDefault("grpc_server_address", "0.0.0.0:8001")
+	viper.SetDefault("grpc_gateway_address", "0.0.0.0:8002")
 	viper.SetDefault("token_type", "paseto")
 	viper.SetDefault("token_duration", time.Hour*24)
 	viper.SetDefault("refresh_token_duration", time.Hour*24*14)

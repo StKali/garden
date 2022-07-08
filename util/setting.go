@@ -12,6 +12,7 @@ type Setting struct {
 	MigrationDirectory   string        `mapstructure:"migration_directory"`
 	GinServerAddress     string        `mapstructure:"gin_server_address"`
 	GRPCServerAddress    string        `mapstructure:"grpc_server_address"`
+	GRPCGatewayAddress   string        `mapstructure:"grpc_gateway_address"`
 	TokenType            string        `mapstructure:"token_type"`
 	TokenDuration        time.Duration `mapstructure:"token_duration"`
 	RefreshTokenDuration time.Duration `mapstructure:"refresh_token_duration"`
