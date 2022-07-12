@@ -45,7 +45,7 @@ var serverCmd = &cobra.Command{
 		// create database connect
 		conn, err := sql.Open(setting.DriverName, setting.DatabaseDriverString)
 		log.Infof("database driver: %s, source name: %s", setting.DriverName, setting.DatabaseDriverString)
-		util.CheckError("cannot open database", err)
+		util.CheckError("failed to open database", err)
 
 		// create store
 		store := db.NewStore(conn)

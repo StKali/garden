@@ -30,7 +30,7 @@ func (s *Server) Start(address string) {
 	pb.RegisterAuthServiceServer(grpcServer, s)
 	reflection.Register(grpcServer)
 	listener, err := net.Listen("tcp", address)
-	util.CheckError(fmt.Sprintf("failed to listen address: %s, err: ", address), err)
+	util.CheckError("failed to listen address: " + address, err)
 	err = grpcServer.Serve(listener)
-	util.CheckError("failed to create grpc server, err: %s", err)
+	util.CheckError("failed to create grpc server", err)
 }
