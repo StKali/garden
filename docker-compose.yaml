@@ -7,6 +7,7 @@ services:
     ports:
       - 8000:8000 # gin HTTP
       - 8001:8001 # grpc
+      - 8002:8002 # grpc-gateway
     volumes:
       - ./.garden.yaml:/workspace/.garden.yaml
     environment:
@@ -25,4 +26,3 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - ./temporary/data/:/var/lib/postgresql/data/pgdata
-

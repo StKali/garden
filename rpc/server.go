@@ -1,7 +1,6 @@
 package rpc
 
 import (
-	"fmt"
 	"net"
 
 	db "github.com/stkali/garden/db/sqlc"
@@ -30,7 +29,7 @@ func (s *Server) Start(address string) {
 	pb.RegisterAuthServiceServer(grpcServer, s)
 	reflection.Register(grpcServer)
 	listener, err := net.Listen("tcp", address)
-	util.CheckError("failed to listen address: " + address, err)
+	util.CheckError("failed to listen address: "+address, err)
 	err = grpcServer.Serve(listener)
 	util.CheckError("failed to create grpc server", err)
 }

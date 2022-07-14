@@ -32,4 +32,7 @@ proto:
 	--grpc-gateway_out=pb --grpc-gateway_opt=paths=source_relative \
 	proto/*.proto
 
+evans:
+	evans -r repl --port 8001
+
 .PHONY: start_pg_server stop_pg_server create_migrate test proto

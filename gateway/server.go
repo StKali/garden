@@ -2,6 +2,9 @@ package gateway
 
 import (
 	"context"
+	"net"
+	"net/http"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	db "github.com/stkali/garden/db/sqlc"
 	"github.com/stkali/garden/pb"
@@ -9,8 +12,6 @@ import (
 	"github.com/stkali/garden/token"
 	"github.com/stkali/garden/util"
 	"google.golang.org/protobuf/encoding/protojson"
-	"net"
-	"net/http"
 )
 
 type Server struct {

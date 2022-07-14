@@ -7,15 +7,14 @@ import (
 	"google.golang.org/grpc/peer"
 )
 
-
 type MetaData struct {
 	UserAgent string
 	ClientIP  string
 }
 
 const (
-	userAgentHeader            = "user-agent"
-	xForwardedForHeader        = "x-forwarded-for"
+	userAgentHeader     = "user-agent"
+	xForwardedForHeader = "x-forwarded-for"
 )
 
 func metaFromCtx(ctx context.Context) *MetaData {

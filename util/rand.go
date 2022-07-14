@@ -36,7 +36,7 @@ func RandInternalString(min, max int) string {
 	if min > max {
 		max, min = min, max
 	}
-	n := min + rand.Intn(max - min)
+	n := min + rand.Intn(max-min)
 	return RandString(n)
 }
 
@@ -54,5 +54,5 @@ func RandEmail() string {
 }
 
 func RandIP() string {
-	return fmt.Sprintf("%d.%d.%d.%d", rand.Int31n(255),rand.Int31n(255),rand.Int31n(255),rand.Int31n(255))
+	return fmt.Sprintf("%d.%d.%d.%d", rand.Int31n(255), rand.Int31n(255), rand.Int31n(255), rand.Int31n(255))
 }

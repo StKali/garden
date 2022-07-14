@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+
 	db "github.com/stkali/garden/db/sqlc"
 	"github.com/stkali/garden/pb"
 	"github.com/stkali/garden/token"
